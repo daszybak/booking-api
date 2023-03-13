@@ -1,0 +1,76 @@
+version: '1'
+services:
+  api.booking.local:
+    container_name: api.booking.local
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      no_cache: true
+    volumes:
+      - api-data:/usr/src/app/data
+      - prisma:/usr/src/app/prisma
+      - src:/usr/src/app/src
+    env_file:
+      - .env
+    expose:
+      - '3001'
+    ports:
+      - '3001:3001'
+    networks:
+      - booking
+    environment:
+      - NODE_ENV=dev
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 2G
+
+  postgres:
+    image: postgres:15.2
+    container_name: postgres.booking.local
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgresPassword1%
+      - POSTGRES_DB=booking
+    restart: unless-stopped
+    networks:
+      - booking
+
+volumes:
+  api-data:
+    driver_opts:
+      type: none
+      device: ./data
+      o: bind
+  prisma:
+    driver_opts:
+      type: none
+      device: ./prisma
+      o: bind
+  src:
+    driver_opts:
+      type: none
+      device: ./src
+      o: bind
+  postgres-data:
+    driver_opts:
+      type: none
+      device: ./data
+      o: bind
+
+networks:
+  booking:
+    name: booking
+    driver: bridge
