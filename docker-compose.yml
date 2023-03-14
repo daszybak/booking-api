@@ -50,25 +50,9 @@ services:
 
 volumes:
   api-data:
-    driver_opts:
-      type: none
-      device: ./data
-      o: bind
   prisma:
-    driver_opts:
-      type: none
-      device: ./prisma
-      o: bind
   src:
-    driver_opts:
-      type: none
-      device: ./src
-      o: bind
   postgres-data:
-    driver_opts:
-      type: none
-      device: ./data
-      o: bind
 
 networks:
   booking:
