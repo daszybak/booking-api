@@ -1,0 +1,11 @@
+{
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"server": "localhost",
+			"driver": "PostgreSQL",
+			"connectString": "postgresql://postgres:postgresPassword1%@localhost:5432/booking?schema=public",
+			"name": "postgres-booking-api"
+		}
+	]
+}

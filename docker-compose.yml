@@ -1,16 +1,15 @@
-version: '1'
+version: '3.9'
 services:
   api.booking.local:
-    container_name: api.booking.local
     build:
       context: .
       dockerfile: Dockerfile
       target: development
       no_cache: true
     volumes:
-      - api-data:/usr/src/app/data
-      - prisma:/usr/src/app/prisma
-      - src:/usr/src/app/src
+      - ./data:/usr/src/app/data
+      - ./prisma:/usr/src/app/prisma
+      - ./src:/usr/src/app/src
     env_file:
       - .env
     expose:
@@ -18,12 +17,15 @@ services:
     ports:
       - '3001:3001'
     networks:
-      - booking
+      booking:
+        aliases:
+          - api
     environment:
       - NODE_ENV=dev
     command: npm run start:dev
     depends_on:
       - postgres
+      - redis
     deploy:
       resources:
         limits:
@@ -35,24 +37,30 @@ services:
 
   postgres:
     image: postgres:15.2
-    container_name: postgres.booking.local
     ports:
       - 5432:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgresPassword1%
-      - POSTGRES_DB=booking
-    restart: unless-stopped
+      DATABASE_URL: ${DATABASE_URL}
+    restart: always
     networks:
-      - booking
+      booking:
+        aliases:
+          - postgres
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
 
 volumes:
-  api-data:
-  prisma:
-  src:
   postgres-data:
+  redis:
+    driver: local
 
 networks:
   booking:
