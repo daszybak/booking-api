@@ -10,3 +10,4 @@ documentation
 .env
 README.md
 .gitignore
+data

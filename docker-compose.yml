@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.8'
 services:
   api.booking.local:
     build:
@@ -6,12 +6,12 @@ services:
       dockerfile: Dockerfile
       target: development
       no_cache: true
+    stdin_open: true
+    tty: true
     volumes:
       - ./data:/usr/src/app/data
       - ./prisma:/usr/src/app/prisma
       - ./src:/usr/src/app/src
-    env_file:
-      - .env
     expose:
       - '3001'
     ports:
@@ -20,8 +20,11 @@ services:
       booking:
         aliases:
           - api
+    env_file:
+      - .env
     environment:
       - NODE_ENV=dev
+      - DATABASE_URL=${DATABASE_URL}
     command: npm run start:dev
     depends_on:
       - postgres
@@ -51,7 +54,7 @@ services:
         aliases:
           - postgres
   redis:
-    image: redis
+    image: redis:7.0.9-alpine3.17
     ports:
       - 6379:6379
     volumes:

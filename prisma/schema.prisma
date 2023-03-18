@@ -1,17 +1,49 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 model Reservation {
-  id        Int      @id @default(autoincrement())
-  start     DateTime
-  finish    DateTime
+  id          Int      @id @default(autoincrement())
+  title       String
+  start_time  DateTime
+  end_time    DateTime
+  userId      Int
+  user        User     @relation("UserReservations", fields: [userId], references: [id])
+  providerId  Int
+  provider    User     @relation("UserProvider", fields: [providerId], references: [id])
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id              Int           @id @default(autoincrement())
+  sub             String        @unique
+  role            UserRole
+  reservations    Reservation[] @relation("UserReservations")
+  provided        Reservation[] @relation("UserProvider")
+  givenRatings    Rating[]      @relation("RatingUser")
+  receivedRatings Rating[]      @relation("RatingProvider")
+}
+
+model Rating {
+  id         Int      @id @default(autoincrement())
+  providerId Int
+  provider   User     @relation("RatingProvider", fields: [providerId], references: [id])
+  userId     Int
+  user       User     @relation("RatingUser", fields: [userId], references: [id])
+  score      Int
+  comment    String?
+  createdAt  DateTime @default(now())
+}
+
+enum UserRole {
+  CLIENT
+  PROVIDER
+  ADMIN
 }

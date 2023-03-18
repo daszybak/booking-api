@@ -1,1 +1,11 @@
 /node_modules
+/src/generated
+.env
+
+.vscode
+
+# Logs
+logs
+*.log
+yarn-debug.log*
+yarn-error.log*

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Reservation, Prisma } from '@prisma/client';
+import type { Prisma, Reservation } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class ReservationService {
 	constructor(private prisma: PrismaService) {}
 
-	async findReservation(userWhereUniqueInput: Prisma.ReservationWhereUniqueInput): Promise<Reservation | null> {
+	async findReservation(reservationWhereUniqueInput: Prisma.ReservationWhereUniqueInput): Promise<Reservation | null> {
 		return this.prisma.reservation.findUnique({
-			where: userWhereUniqueInput,
+			where: reservationWhereUniqueInput,
 		});
 	}
 
@@ -19,13 +19,8 @@ export class ReservationService {
 		where?: Prisma.ReservationWhereInput;
 		orderBy?: Prisma.ReservationOrderByWithRelationInput;
 	}): Promise<Reservation[]> {
-		const { skip, take, cursor, where, orderBy } = params;
 		return this.prisma.reservation.findMany({
-			skip,
-			take,
-			cursor,
-			where,
-			orderBy,
+			...params,
 		});
 	}
 

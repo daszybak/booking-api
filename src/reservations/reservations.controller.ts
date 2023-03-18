@@ -1,5 +1,6 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { ReservationService } from './reservations.service';
+import { Prisma } from '@prisma/client';
 
 @Controller('reservations')
 export class ReservationsController {
@@ -9,10 +10,9 @@ export class ReservationsController {
 		return this.reservationsService.findAllReservations({}) || 'No reservations found';
 	}
 	@Post()
-	createReservation() {
+	createReservation(params: Prisma.ReservationCreateInput) {
 		return this.reservationsService.createReservation({
-			start: new Date(),
-			finish: new Date(),
+			...params,
 		});
 	}
 }
