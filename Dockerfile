@@ -41,9 +41,9 @@ COPY --chown=node:node package*.json ./
 COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node . .
 
-RUN npm run build
+RUN yarn build
 ENV NODE_ENV production
-RUN npm ci --only=production && npm cache clean --force
+RUN yarn install --production=true --frozen-lockfile && yarn cache clean
 
 USER node
 
