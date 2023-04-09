@@ -23,38 +23,43 @@ model User {
   id              Int           @id @default(autoincrement())
   sub             String        @unique
   role            UserRole
-  reservations    Reservation[] @relation("UserReservations")
+  reserved        Reservation[] @relation("UserReservations")
   provided        Reservation[] @relation("UserProvider")
   givenRatings    Rating[]      @relation("RatingUser")
   receivedRatings Rating[]      @relation("RatingProvider")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+  email           String?
+  name            String?
 }
 
 model Rating {
-  id         Int       @id @default(autoincrement())
-  providerId Int
-  provider   User      @relation("RatingProvider", fields: [providerId], references: [id])
-  userId     Int
-  user       User      @relation("RatingUser", fields: [userId], references: [id])
-  score      Int
-  comment    String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
+  id          Int       @id @default(autoincrement())
+  providerId  Int
+  provider    User      @relation("RatingProvider", fields: [providerId], references: [id])
+  recipientId Int
+  recipient   User      @relation("RatingUser", fields: [recipientId], references: [id])
+  score       Int
+  comment     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 }
 
 model Status {
-  id            Int         @id @default(autoincrement())
+  id            Int               @id @default(autoincrement())
   name          ReservationStatus
   reservationId Int
-  reservation   Reservation @relation("ReservationStatus", fields: [reservationId], references: [id])
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  reservation   Reservation       @relation("ReservationStatus", fields: [reservationId], references: [id])
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
   deletedAt     DateTime?
   timeline      Int
 }
 
 enum UserRole {
-  CLIENT
+  RECIPIENT
   PROVIDER
   ADMIN
 }
