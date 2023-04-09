@@ -1,2 +1,2 @@
 # booking-api
-Connected to: booking-web, booking-sso, booking-mobile repositories
+Connected to: booking-web
