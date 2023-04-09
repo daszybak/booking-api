@@ -1,0 +1,41 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: Build Docker image
+        run: docker build --target production -t booking-api .
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Push Docker image to Amazon ECR
+        run: |
+          docker tag booking-api:latest ${{ steps.login-ecr.outputs.registry }}/booking-api:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/booking-api:latest
+      - name: Deploy to EC2 using CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name booking-api \
+            --deployment-group-name production \
+            --file-exists-behavior OVERWRITE
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
