@@ -27,8 +27,10 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     command: npm run start:dev
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -53,12 +55,22 @@ services:
       booking:
         aliases:
           - postgres
+    healthcheck:
+      test: ['CMD-SHELL', "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
   redis:
     image: redis:7.0.9-alpine3.17
     ports:
       - 6379:6379
     volumes:
       - redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 1s
+      timeout: 3s
+      retries: 5
 
 volumes:
   postgres-data:
